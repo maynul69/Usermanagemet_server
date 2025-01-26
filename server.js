@@ -21,20 +21,6 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// const authenticate = async (req, res, next) => {
-//   const token = req.headers.authorization;
-//   if (!token) return res.status(401).json({ error: 'Unauthorized' });
-
-//   try {
-//     const decoded = jwt.verify(token, 'secret_key');
-//     const user = await pool.query('SELECT * FROM users WHERE id = $1 AND status = $2', [decoded.id, 'active']);
-//     if (user.rowCount === 0) return res.status(403).json({ error: 'Blocked or non-existent user' });
-//     req.user = user.rows[0];
-//     next();
-//   } catch {
-//     res.status(401).json({ error: 'Unauthorized' });
-//   }
-// };
 
 const authenticate = async (req, res, next) => {
   const token = req.headers.authorization;
@@ -138,4 +124,4 @@ app.delete('/users', authenticate, async (req, res) => {
 //   res.sendStatus(200);
 // });
 
-app.listen(5000, () => console.log('Server running on port 5000'));
+app.listen(PORT, () => console.log('Server running on port 5000'));
