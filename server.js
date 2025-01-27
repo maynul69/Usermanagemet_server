@@ -14,9 +14,9 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 
 const corsOptions = {
-  origin: 'http://localhost:5173', // Frontend origin
-  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
-  allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 };
 
 
@@ -43,12 +43,20 @@ app.post('/register', async (req, res) => {
   const { name, email, password } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
   try {
-    const result = await pool.query('INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *', [name, email, hashedPassword]);
+    const result = await pool.query(
+      'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING *',
+      [name, email, hashedPassword]
+    );
     res.status(201).json(result.rows[0]);
   } catch (error) {
-    res.status(400).json({ error: 'Email already exists' });
+    if (error.code === '23505') { // PostgreSQL unique_violation error code
+      res.status(400).json({ error: 'Email already exists' });
+    } else {
+      res.status(500).json({ error: 'Internal Server Error' });
+    }
   }
 });
+
 
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
@@ -64,8 +72,8 @@ app.post('/login', async (req, res) => {
   res.json({ token, user });
 });
 
-app.get('/users', authenticate, async (req, res) => {
-  const result = await pool.query('SELECT id, name, email, status, last_login FROM users ORDER BY last_login DESC');
+app.get('/users', async (req, res) => {
+  const result = await pool.query('SELECT id, name, email,password, status, last_login FROM users ORDER BY last_login DESC');
   res.json(result.rows);
 });
 
