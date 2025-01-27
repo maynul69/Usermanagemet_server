@@ -95,5 +95,10 @@ app.delete('/users', authenticate, async (req, res) => {
   res.sendStatus(200);
 });
 
+app.get('/', async (req, res) => {
+  res.send("Hello")
+});
+
+
 
 app.listen(PORT, () => console.log('Server running on port 5000'));
