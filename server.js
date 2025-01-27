@@ -15,6 +15,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "127.0.0.1:3000",
+      "https://usermanagemet-client.vercel.app"
       // "https://crm-frontend-test-rouge.vercel.app",
     ],
 
