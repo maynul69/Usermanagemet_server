@@ -14,13 +14,15 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 
 const corsOptions = {
-  origin: 'http://localhost:5173', // Frontend origin
+  origin: 'https://usermanagemet-server.vercel.app', // Frontend origin
   methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
   allowedHeaders: ['Content-Type', 'Authorization'], // Allowed headers
 };
 
-app.use(cors(corsOptions));
 
+app.use(cors());
+
+app.options('*', cors(corsOptions)); 
 
 const authenticate = async (req, res, next) => {
   const token = req.headers.authorization;
@@ -85,43 +87,5 @@ app.delete('/users', authenticate, async (req, res) => {
   res.sendStatus(200);
 });
 
-// app.get('/users', authenticate, async (req, res) => {
-//   const result = await pool.query('SELECT id, name, email, status, last_login, created_at FROM users ORDER BY last_login DESC');
-//   res.json(result.rows);
-// });
-
-// app.put('/users/block', authenticate, async (req, res) => {
-//   const { ids } = req.body;
-//   await pool.query('UPDATE users SET status = $1 WHERE id = ANY($2)', ['blocked', ids]);
-//   res.sendStatus(200);
-// });
-
-// app.put('/users/unblock', authenticate, async (req, res) => {
-//   const { ids } = req.body;
-//   await pool.query('UPDATE users SET status = $1 WHERE id = ANY($2)', ['active', ids]);
-//   res.sendStatus(200);
-// });
-
-// app.delete('/users', authenticate, async (req, res) => {
-//   const { ids } = req.body;
-//   if (!Array.isArray(ids) || ids.length === 0) {
-//     return res.status(400).json({ error: 'Invalid or empty list of user IDs' });
-//   }
-
-//   try {
-//     await pool.query('DELETE FROM users WHERE id = ANY($1)', [ids]);
-//     res.sendStatus(200);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: 'Failed to delete users' });
-//   }
-// });
-
-
-// app.delete('/users', authenticate, async (req, res) => {
-//   const { ids } = req.body;
-//   await pool.query('DELETE FROM users WHERE id = ANY($2)', [ids]);
-//   res.sendStatus(200);
-// });
 
 app.listen(PORT, () => console.log('Server running on port 5000'));
